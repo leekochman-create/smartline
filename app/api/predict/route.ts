@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
-import { supabase } from "@/app/lib/supabase";
+import { supabase } from "@/lib/supabase";
 
 const ai = new OpenAI({ apiKey: process.env.OPENAI_KEY });
 
-export async function POST(req) {
+export async function POST(req: Request) {
   const { businessId } = await req.json();
 
   const { data: reports } = await supabase
