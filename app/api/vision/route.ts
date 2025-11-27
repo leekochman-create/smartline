@@ -1,24 +1,20 @@
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
+import { supabase } from "@/lib/supabase";
 
-const client = new OpenAI({ apiKey: process.env.OPENAI_KEY });
+const ai = new OpenAI({ apiKey: process.env.OPENAI_KEY });
 
-export async function POST(req) {
-  const { image } = await req.json();
+export async function POST(req: Request) {
+  const form = await req.formData();
+  const file = form.get("file") as File;
 
-  const res = await client.responses.create({
-    model: "gpt-4.1",
-    input: [
-      {
-        type: "input_image",
-        image_url: `data:image/jpeg;base64,${image}`
-      },
-      {
-        type: "text",
-        text: "ספר כמה אנשים בתור וכמה קופות פעילות. החזר JSON בלבד."
-      }
-    ]
+  const buffer = Buffer.from(await file.arrayBuffer());
+
+  const vision = await ai.images.generate({
+    model: "gpt-image-1",
+    prompt: "Analyze this image",
+    image: buffer,
   });
 
-  return NextResponse.json(JSON.parse(res.output_text));
+  return NextResponse.json({ result: vision.data });
 }
