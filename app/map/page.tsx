@@ -10,11 +10,12 @@ export default function MapPage() {
 
   useEffect(() => {
     async function load() {
+      // טוען את כל העסקים
       const res = await fetch("/api/places");
       const data = await res.json();
       setPlaces(data);
 
-      // Translate crowd reports to heatmap intensity (simple)
+      // מייצר נקודות Heatmap
       const points = data.map((p) => ({
         lat: p.lat,
         lng: p.lng
@@ -34,10 +35,13 @@ export default function MapPage() {
         <HeatmapLayer points={heatmapPoints} />
       </Map>
 
-      <div style={{ marginTop: 20 }}>
-        <h3>מקומות</h3>
+      <div style={{ marginTop: 30 }}>
+        <h3>רשימת מקומות במפה</h3>
+        {places.length === 0 && <p>טוען...</p>}
         {places.map((p) => (
-          <p key={p.id}>{p.name}</p>
+          <div key={p.id} style={{ marginBottom: 6, opacity: 0.8 }}>
+            {p.name} – {p.address || "ללא כתובת"}
+          </div>
         ))}
       </div>
     </div>
