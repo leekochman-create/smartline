@@ -20,7 +20,6 @@ export async function POST(req: Request) {
       ${JSON.stringify(reports)}
 
       צור תחזית לפי שעות:
-      פורמט:
       [{"hour": 10, "predicted_wait": 5}]
     `
   });
