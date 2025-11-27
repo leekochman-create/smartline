@@ -3,6 +3,5 @@ export async function fetchCameraFrame(url: string) {
     method: "POST",
     body: JSON.stringify({ url })
   });
-
   return await res.json();
 }
