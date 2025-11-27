@@ -1,14 +1,15 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 
-export async function POST(req) {
-  const body = await req.json();
+export async function POST(req: Request) {
+  const { businessId, level } = await req.json();
 
-  await supabase.from("crowd_reports").insert({
-    business_id: body.businessId,
-    people: body.people,
-    registers: body.registers
+  const { error } = await supabase.from("crowd_reports").insert({
+    business_id: businessId,
+    level,
   });
 
-  return NextResponse.json({ ok: true });
+  if (error) return NextResponse.json({ error: error.message }, { status: 400 });
+
+  return NextResponse.json({ success: true });
 }
