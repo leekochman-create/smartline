@@ -16,10 +16,12 @@ export async function POST(req) {
   const res = await ai.responses.create({
     model: "gpt-4.1",
     input: `
-      תן תחזית לעומס לפי שעות על בסיס הנתונים:
+      נתוני עומס היסטוריים:
       ${JSON.stringify(reports)}
-      החזר JSON בצורה:
-      [{ "hour": 10, "predicted_wait": 5 }]
+
+      צור תחזית לפי שעות:
+      פורמט:
+      [{"hour": 10, "predicted_wait": 5}]
     `
   });
 
