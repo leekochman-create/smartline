@@ -1,28 +1,22 @@
 import { NextResponse } from "next/server";
-import OpenAI from "openai";
-import { supabase } from "@/lib/supabase";
-
-const ai = new OpenAI({ apiKey: process.env.OPENAI_KEY });
+import { supabaseServer } from "@/lib/supabaseServer";
 
 export async function POST(req: Request) {
-  const { businessId } = await req.json();
+  try {
+    const { placeId } = await req.json();
 
-  const { data: reports } = await supabase
-    .from("crowd_reports")
-    .select("*")
-    .eq("business_id", businessId)
-    .order("created_at", { ascending: true });
+    const { data, error } = await supabaseServer
+      .from("reports")
+      .select("*")
+      .eq("place_id", placeId);
 
-  const res = await ai.responses.create({
-    model: "gpt-4.1",
-    input: `
-      נתוני עומס היסטוריים:
-      ${JSON.stringify(reports)}
+    if (error) {
+      console.error(error);
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
 
-      צור תחזית לפי שעות:
-      [{"hour": 10, "predicted_wait": 5}]
-    `
-  });
-
-  return NextResponse.json(JSON.parse(res.output_text));
+    return NextResponse.json({ data });
+  } catch (err: any) {
+    return NextResponse.json({ error: err.message }, { status: 500 });
+  }
 }
