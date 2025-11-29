@@ -1,15 +1,23 @@
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { supabaseServer } from "@/lib/supabaseServer";
 
 export async function POST(req: Request) {
-  const { businessId, level } = await req.json();
+  try {
+    const body = await req.json();
 
-  const { error } = await supabase.from("crowd_reports").insert({
-    business_id: businessId,
-    level,
-  });
+    const { data, error } = await supabaseServer
+      .from("reports")
+      .insert(body)
+      .select()
+      .single();
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 400 });
+    if (error) {
+      console.error(error);
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    }
 
-  return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, data });
+  } catch (err: any) {
+    return NextResponse.json({ error: err.message }, { status: 500 });
+  }
 }
