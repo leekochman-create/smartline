@@ -1,17 +1,23 @@
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { supabaseServer } from "@/lib/supabaseServer";
 
 export async function POST(req: Request) {
-  const { name, address, lat, lng } = await req.json();
+  try {
+    const body = await req.json();
 
-  const { error } = await supabase.from("businesses").insert({
-    name,
-    address,
-    lat,
-    lng,
-  });
+    const { data, error } = await supabaseServer
+      .from("places")
+      .insert(body)
+      .select()
+      .single();
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 400 });
+    if (error) {
+      console.error("Supabase insert error:", error);
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    }
 
-  return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, data });
+  } catch (err: any) {
+    return NextResponse.json({ error: err.message }, { status: 500 });
+  }
 }
