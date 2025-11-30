@@ -18,7 +18,6 @@ export async function POST(req: Request) {
     const arrayBuffer = await file.arrayBuffer();
     const base64Image = Buffer.from(arrayBuffer).toString("base64");
 
-    // Vision analysis using chat.completions
     const response = await client.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
@@ -31,8 +30,10 @@ export async function POST(req: Request) {
             },
             {
               type: "image_url",
-              image_url: `data:image/jpeg;base64,${base64Image}`,
-            },
+              image_url: {
+                url: `data:image/jpeg;base64,${base64Image}`
+              }
+            }
           ],
         },
       ],
