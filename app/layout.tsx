@@ -1,4 +1,5 @@
 import "./globals.css";
+import Script from "next/script";
 
 export const metadata = {
   title: "SmartLine",
@@ -10,11 +11,11 @@ export default function RootLayout({ children }) {
     <html lang="he">
       <body>
 
-        {/* Google Maps API */}
-        <script
+        {/* Google Maps API חייב להיות עם next/script */}
+        <Script
           src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY}&libraries=visualization`}
-          async
-        ></script>
+          strategy="beforeInteractive"
+        />
 
         {children}
       </body>
