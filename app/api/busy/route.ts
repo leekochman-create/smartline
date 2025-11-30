@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { supabaseServer } from "@/lib/supabaseServer"; // ← זה מה שקיים אצלך
+import { supabaseServer } from "@/lib/supabaseServer";
 
 export async function GET() {
   const { data, error } = await supabaseServer
@@ -7,8 +7,7 @@ export async function GET() {
     .select("*");
 
   if (error) {
-    console.error(error);
-    return NextResponse.json({ error }, { status: 500 });
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
   return NextResponse.json(data);
