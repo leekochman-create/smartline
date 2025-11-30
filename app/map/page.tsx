@@ -1,13 +1,36 @@
 "use client";
 
-import Map from "../components/Map";
-import HeatmapLayer from "../components/HeatmapLayer";
+import { useEffect } from "react";
 
-export default function MapPage() {
+declare global {
+  interface Window {
+    google: any;
+  }
+}
+
+export default function Map() {
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (window.google && typeof window.google.maps !== "undefined") {
+        const map = new window.google.maps.Map(
+          document.getElementById("map") as HTMLElement,
+          {
+            center: { lat: 32.0853, lng: 34.7818 },
+            zoom: 13,
+          }
+        );
+
+        clearInterval(interval);
+      }
+    }, 200);
+
+    return () => clearInterval(interval);
+  }, []);
+
   return (
-    <div style={{ width: "100%", height: "100%" }}>
-      <Map />
-      <HeatmapLayer />
-    </div>
+    <div
+      id="map"
+      style={{ width: "100%", height: "500px", borderRadius: "12px" }}
+    ></div>
   );
 }
