@@ -1,22 +1,31 @@
-"use client";
+export default function PlaceCard({ place }: { place?: any }) {
+  if (!place) {
+    return (
+      <div
+        style={{
+          padding: "20px",
+          borderRadius: "10px",
+          background: "#f2f2f2",
+          marginBottom: "10px",
+        }}
+      >
+        No place data
+      </div>
+    );
+  }
 
-import Link from "next/link";
-
-export default function PlaceCard({ place }) {
   return (
-    <Link
-      href={`/place/${place.id}`}
+    <div
       style={{
-        display: "block",
+        padding: "20px",
+        borderRadius: "10px",
         background: "#fff",
-        padding: 20,
-        borderRadius: 12,
-        boxShadow: "0 2px 10px rgba(0,0,0,0.06)",
-        marginBottom: 16
+        marginBottom: "10px",
+        border: "1px solid #ddd",
       }}
     >
       <h3>{place.name}</h3>
-      <p style={{ opacity: 0.6 }}>{place.address}</p>
-    </Link>
+      <p>{place.address}</p>
+    </div>
   );
 }
