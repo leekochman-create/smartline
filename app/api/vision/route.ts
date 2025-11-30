@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
 
-export const runtime = "nodejs"; // מאפשר Buffer ו-File מלא
+export const runtime = "nodejs";
 
 const client = new OpenAI({
   apiKey: process.env.OPENAI_KEY!,
@@ -18,19 +18,20 @@ export async function POST(req: Request) {
     const arrayBuffer = await file.arrayBuffer();
     const base64Image = Buffer.from(arrayBuffer).toString("base64");
 
+    // Vision analysis using chat.completions
     const response = await client.chat.completions.create({
-      model: "gpt-4o-mini", // מודל רואה תמונות
+      model: "gpt-4o-mini",
       messages: [
         {
           role: "user",
           content: [
             {
-              type: "input_image",
-              image_url: `data:image/jpeg;base64,${base64Image}`,
-            },
-            {
               type: "text",
               text: "Analyze this image in detail.",
+            },
+            {
+              type: "image_url",
+              image_url: `data:image/jpeg;base64,${base64Image}`,
             },
           ],
         },
@@ -41,6 +42,7 @@ export async function POST(req: Request) {
       result: response.choices[0].message.content,
     });
   } catch (err: any) {
+    console.error(err);
     return NextResponse.json(
       { error: err.message || "Unknown error" },
       { status: 500 }
