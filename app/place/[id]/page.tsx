@@ -1,54 +1,59 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 
-export default function PlacePage({ params }) {
-  const [place, setPlace] = useState(null);
-  const [image, setImage] = useState("");
-  const [result, setResult] = useState(null);
+export default function PlacePage({ params }: any) {
+  const { id } = params;
+  const [image, setImage] = useState<string | null>(null);
+  const [place, setPlace] = useState<any>(null);
 
   useEffect(() => {
-    fetch("/api/places?id=" + params.id)
-      .then((r) => r.json())
-      .then(setPlace);
-  }, []);
+    async function loadPlace() {
+      const res = await fetch(`/api/places?id=${id}`);
+      const data = await res.json();
+      setPlace(data.places?.[0] || null);
+    }
+    loadPlace();
+  }, [id]);
 
-  const upload = (e) => {
+  const upload = (e: any) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
     const reader = new FileReader();
-    reader.onloadend = () => setImage(reader.result.split(",")[1]);
-    reader.readAsDataURL(e.target.files[0]);
-  };
 
-  const analyze = async () => {
-    const res = await fetch("/api/vision", {
-      method: "POST",
-      body: JSON.stringify({ image })
-    });
-    setResult(await res.json());
-  };
+    reader.onloadend = () => {
+      const result = reader.result as string; // ← FIX
+      const base64 = result.split(",")[1]; // ← SAFE
+      setImage(base64);
+    };
 
-  if (!place) return <div style={{ padding: 40 }}>טוען...</div>;
+    reader.readAsDataURL(file);
+  };
 
   return (
-    <div style={{ padding: 40 }}>
-      <h1>{place.name}</h1>
-      <p>{place.address}</p>
+    <div style={{ padding: "20px" }}>
+      <h1>Place ID: {id}</h1>
 
-      <div style={{ marginTop: 30 }}>
-        <h3>בדוק עומס עם תמונה</h3>
-        <input type="file" onChange={upload} />
-        <button onClick={analyze}>נתח</button>
-      </div>
-
-      {result && (
-        <div style={{ marginTop: 20 }}>
-          <p>אנשים בתור: {result.people}</p>
-          <p>עמדות פעילות: {result.registers}</p>
-          <p>
-            זמן המתנה משוער:{" "}
-            <b>{Math.ceil(result.people / result.registers * 0.6)} דקות</b>
-          </p>
+      {place && (
+        <div style={{ marginBottom: "20px" }}>
+          <h2>{place.name}</h2>
+          <p>{place.address}</p>
         </div>
+      )}
+
+      <input
+        type="file"
+        accept="image/*"
+        onChange={upload}
+        style={{ marginBottom: "20px" }}
+      />
+
+      {image && (
+        <img
+          src={`data:image/jpeg;base64,${image}`}
+          style={{ width: "300px", borderRadius: "10px", marginTop: "10px" }}
+        />
       )}
     </div>
   );
