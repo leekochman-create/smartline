@@ -1,4 +1,3 @@
-
 "use client";
 
 import Link from "next/link";
@@ -6,7 +5,6 @@ import Link from "next/link";
 export default function HomePage() {
   return (
     <div style={{ padding: 40 }}>
-
       <h1 style={{ fontSize: 36, marginBottom: 20 }}>
         ברוך הבא ל-SmartLine Ultra
       </h1>
