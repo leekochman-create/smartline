@@ -2,35 +2,41 @@
 
 import { useEffect } from "react";
 
-declare global {
-  interface Window {
-    google: any;
-  }
-}
-
-export default function Map() {
+export default function MapPage() {
   useEffect(() => {
-    const interval = setInterval(() => {
-      if (window.google && typeof window.google.maps !== "undefined") {
-        const map = new window.google.maps.Map(
-          document.getElementById("map") as HTMLElement,
-          {
-            center: { lat: 32.0853, lng: 34.7818 },
-            zoom: 13,
-          }
-        );
+    // טוען סקריפט דינמית — הדרך הנכונה ב-Next.js
+    const script = document.createElement("script");
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY}`;
+    script.async = true;
+    script.defer = true;
 
-        clearInterval(interval);
-      }
-    }, 200);
+    script.onload = () => {
+      initMap();
+    };
 
-    return () => clearInterval(interval);
+    document.body.appendChild(script);
   }, []);
+
+  function initMap() {
+    if (!window.google) return;
+
+    const map = new window.google.maps.Map(
+      document.getElementById("map") as HTMLElement,
+      {
+        center: { lat: 32.0853, lng: 34.7818 },
+        zoom: 13,
+      }
+    );
+  }
 
   return (
     <div
       id="map"
-      style={{ width: "100%", height: "500px", borderRadius: "12px" }}
+      style={{
+        width: "100%",
+        height: "100vh",
+        borderRadius: "0px",
+      }}
     ></div>
   );
 }
