@@ -3,7 +3,7 @@ import OpenAI from "openai";
 import { createClient } from "@supabase/supabase-js";
 
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: process.env.OPENAI_API_KEY!,
 });
 
 const supabase = createClient(
@@ -19,8 +19,9 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "Missing camera id" }, { status: 400 });
   }
 
+  // Fetch camera info
   const { data: cam } = await supabase
-    .from("camera_sources")
+    .from("global_cameras")
     .select("*")
     .eq("id", cameraId)
     .single();
@@ -29,32 +30,44 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "Camera not found" }, { status: 404 });
   }
 
-  // 1️⃣ Fetch frame
-  const frame = await fetch(cam.camera_url);
-  const buffer = Buffer.from(await frame.arrayBuffer());
+  // Fetch frame
+  const frameRes = await fetch(cam.camera_url);
+  const buffer = Buffer.from(await frameRes.arrayBuffer());
 
-  // 2️⃣ Analyze with OpenAI Vision
-  const ai = await openai.images.generate({
-    model: "gpt-image-1",
-    prompt: "Count the number of people and estimate crowd density from this image.",
-    image: buffer.toString("base64"),
+  // OpenAI Vision — correct format
+  const result = await openai.chat.completions.create({
+    model: "gpt-4o-mini",
+    messages: [
+      {
+        role: "user",
+        content: [
+          { type: "text", text: "Count the number of people in this image." },
+          {
+            type: "input_image",
+            image_url: `data:image/jpeg;base64,${buffer.toString("base64")}`,
+          },
+        ],
+      },
+    ],
   });
 
-  const json = JSON.parse(ai.data[0].b64_json);
+  // Parse result
+  const responseText = result.choices[0].message.content || "0";
+  const peopleCount = parseInt(responseText.replace(/\D/g, "")) || 0;
 
-  const busy_level = Math.min(10, Math.max(1, Math.ceil(json.people / 5)));
+  const busyLevel = Math.min(10, Math.max(0, Math.ceil(peopleCount / 5)));
 
-  // 3️⃣ Update busy table
-  await supabase.from("busy").upsert({
-    place_id: cam.place_id,
-    busy_level,
-    lat: cam.lat,
-    lng: cam.lng,
+  // Save to Supabase
+  await supabase.from("busy_global").upsert({
+    camera_id: cam.id,
+    people_count: peopleCount,
+    busy_level: busyLevel,
     updated_at: new Date().toISOString(),
   });
 
   return NextResponse.json({
-    people: json.people,
-    busy_level,
+    camera: cam.name,
+    people: peopleCount,
+    busy_level: busyLevel,
   });
 }
