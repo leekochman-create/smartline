@@ -1,15 +1,16 @@
+// app/page.tsx
 "use client";
 
-import IsraelCamerasMap from "./components/IsraelCamerasMap";
+import IsraelLiveMap from "./components/IsraelLiveMap";
 
 export default function HomePage() {
   return (
     <div style={{ padding: 20 }}>
-      <h1 style={{ textAlign: "center", marginBottom: 20 }}>
-        מפת מצלמות ישראל — לייב
+      <h1 style={{ textAlign: "center", marginBottom: 25 }}>
+        מפת מצלמות לייב — ישראל 🌍📹
       </h1>
 
-      <IsraelCamerasMap />
+      <IsraelLiveMap />
     </div>
   );
 }
