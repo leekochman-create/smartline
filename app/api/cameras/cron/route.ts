@@ -1,32 +1,46 @@
 // app/api/cameras/cron/route.ts
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/supabaseClient";
+import { supabaseServer } from "@/lib/supabaseServer";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  // get all cameras
-  const { data: cameras } = await supabase.from("israel_cameras").select("*");
-  if (!cameras) return NextResponse.json({ error: "NO CAMERAS" });
+  try {
+    // Load camera list
+    const { data: cameras, error } = await supabaseServer
+      .from("israel_cameras")
+      .select("*");
 
-  for (const cam of cameras) {
-    const res = await fetch(process.env.NEXT_PUBLIC_SITE_URL + "/api/cameras/analyze", {
-      method: "POST",
-      body: JSON.stringify({ imageUrl: cam.snapshot }),
-    });
+    if (error) {
+      console.error(error);
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
 
-    const json = await res.json();
+    if (!cameras) {
+      return NextResponse.json({ error: "NO CAMERAS" }, { status: 400 });
+    }
 
-    const people = json.people || 0;
+    // Analyze each camera
+    for (const cam of cameras) {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/cameras/analyze`, {
+        method: "POST",
+        body: JSON.stringify({ imageUrl: cam.snapshot }),
+      });
 
-    await supabase
-      .from("busy")
-      .upsert({
+      const json = await res.json();
+      const people = json.people || 0;
+
+      // Update table
+      await supabaseServer.from("busy").upsert({
         camera_id: cam.id,
         people,
         updated_at: new Date().toISOString(),
       });
-  }
+    }
 
-  return NextResponse.json({ ok: true });
+    return NextResponse.json({ success: true });
+  } catch (err) {
+    console.error("CRON ERROR:", err);
+    return NextResponse.json({ error: "Cron failed" }, { status: 500 });
+  }
 }
