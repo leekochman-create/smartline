@@ -1,13 +1,13 @@
 // app/map/page.tsx
 "use client";
 
-import Map from "../components/Map";
+import IsraelCamerasMap from "../components/IsraelCamerasMap";
 
 export default function MapPage() {
   return (
     <div style={{ padding: 20 }}>
-      <h1 style={{ marginBottom: 20, textAlign: "center" }}>מפת עומסים</h1>
-      <Map />
+      <h1 style={{ marginBottom: 20, textAlign: "center" }}>מפת מצלמות ישראל (לייב)</h1>
+      <IsraelCamerasMap />
     </div>
   );
 }
