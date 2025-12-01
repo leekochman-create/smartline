@@ -1,22 +1,15 @@
 import { NextResponse } from "next/server";
-import { supabaseServer } from "../../../utils/supabaseServer";
 
-export async function GET() {
-  try {
-    const { data, error } = await supabaseServer
-      .from("places")
-      .select("*")
-      .order("id", { ascending: true });
+export async function GET(req: Request) {
+  const { searchParams } = new URL(req.url);
+  const lat = searchParams.get("lat");
+  const lng = searchParams.get("lng");
+  const type = searchParams.get("type") || "supermarket";
 
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
-    }
+  const url = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=4000&type=${type}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`;
 
-    return NextResponse.json({ places: data });
-  } catch (err: any) {
-    return NextResponse.json(
-      { error: err.message || "Unknown error" },
-      { status: 500 }
-    );
-  }
+  const res = await fetch(url);
+  const data = await res.json();
+
+  return NextResponse.json({ places: data.results });
 }
