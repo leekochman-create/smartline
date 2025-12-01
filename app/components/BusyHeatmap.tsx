@@ -4,8 +4,6 @@ import { useEffect, useState } from "react";
 import { Loader } from "@googlemaps/js-api-loader";
 
 export default function BusyHeatmap() {
-  const [map, setMap] = useState(null);
-
   useEffect(() => {
     const initMap = async () => {
       const loader = new Loader({
@@ -16,30 +14,29 @@ export default function BusyHeatmap() {
 
       const google = await loader.load();
 
-      const mapInstance = new google.maps.Map(
+      const map = new google.maps.Map(
         document.getElementById("busy-map") as HTMLElement,
         {
           center: { lat: 32.0853, lng: 34.7818 },
-          zoom: 14,
+          zoom: 13,
           disableDefaultUI: false,
         }
       );
 
-      setMap(mapInstance);
-
-      // ----- LOAD BUSY DATA FROM SUPABASE -----
+      // ---- LOAD BUSY DATA ----
       const res = await fetch("/api/busy");
-      const busyData = await res.json();
+      const json = await res.json();
+      const busyData = json.busy;
 
       const heatmapPoints = busyData.map((item: any) => ({
         location: new google.maps.LatLng(item.lat, item.lng),
-        weight: item.busy_level, // 1-10 scale
+        weight: item.busy_level ?? 1,
       }));
 
       new google.maps.visualization.HeatmapLayer({
         data: heatmapPoints,
         radius: 35,
-        map: mapInstance,
+        map,
       });
     };
 
