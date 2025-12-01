@@ -1,20 +1,16 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!, // ← הפתרון
-  { auth: { persistSession: false } }
-);
+import path from "path";
+import { promises as fs } from "fs";
 
 export async function GET() {
-  const { data, error } = await supabase
-    .from("israel_cameras")
-    .select("*");
+  try {
+    const filePath = path.join(process.cwd(), "public/data/israel_cameras.json");
+    const fileData = await fs.readFile(filePath, "utf8");
+    const cameras = JSON.parse(fileData);
 
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ cameras });
+  } catch (error) {
+    console.error("Error loading cameras:", error);
+    return NextResponse.json({ error: "Failed to load cameras" }, { status: 500 });
   }
-
-  return NextResponse.json({ cameras: data });
 }
