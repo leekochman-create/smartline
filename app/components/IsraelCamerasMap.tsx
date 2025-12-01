@@ -26,7 +26,8 @@ export default function IsraelCamerasMap() {
 
       setMap(mapInstance);
 
-      const res = await fetch("/api/cameras/list");
+      // GET CAMERAS
+      const res = await fetch("/api/cameras/list-israel");
       const json = await res.json();
 
       json.cameras.forEach((cam: any) => {
@@ -47,11 +48,15 @@ export default function IsraelCamerasMap() {
 
   return (
     <>
-      <div id="israel-map" style={{ width: "100%", height: "650px", borderRadius: "15px" }} />
+      <div
+        id="israel-map"
+        style={{ width: "100%", height: "650px", borderRadius: "15px" }}
+      />
 
       {selectedStream && (
         <div style={{ marginTop: "20px" }}>
           <h3>📹 צפייה במצלמה</h3>
+
           <video
             src={selectedStream}
             autoPlay
