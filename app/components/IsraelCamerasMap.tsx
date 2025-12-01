@@ -11,7 +11,7 @@ export default function IsraelCamerasMap() {
     async function init() {
       const loader = new Loader({
         apiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!,
-        version: "weekly"
+        version: "weekly",
       });
 
       const google = await loader.load();
@@ -20,13 +20,12 @@ export default function IsraelCamerasMap() {
         document.getElementById("israel-map") as HTMLElement,
         {
           center: { lat: 31.5, lng: 34.8 },
-          zoom: 8
+          zoom: 8,
         }
       );
 
       setMap(mapInstance);
 
-      // GET CAMERAS
       const res = await fetch("/api/cameras/list-israel");
       const json = await res.json();
 
@@ -34,11 +33,14 @@ export default function IsraelCamerasMap() {
         const marker = new google.maps.Marker({
           position: { lat: cam.lat, lng: cam.lng },
           map: mapInstance,
-          title: cam.name
+          title: cam.name,
         });
 
         marker.addListener("click", () => {
-          setSelectedStream(cam.stream);
+          const proxyUrl =
+            "/api/proxy/stream?url=" +
+            encodeURIComponent(cam.stream);
+          setSelectedStream(proxyUrl);
         });
       });
     }
@@ -54,9 +56,8 @@ export default function IsraelCamerasMap() {
       />
 
       {selectedStream && (
-        <div style={{ marginTop: "20px" }}>
+        <div style={{ marginTop: 20 }}>
           <h3>📹 צפייה במצלמה</h3>
-
           <video
             src={selectedStream}
             autoPlay
