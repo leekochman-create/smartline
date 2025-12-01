@@ -1,0 +1,72 @@
+[
+  {
+    "id": "il_cam_001",
+    "name": "תל אביב – חוף פרישמן",
+    "lat": 32.0807,
+    "lng": 34.7680,
+    "stream": "https://ipc.technion.ac.il/prishman/playlist.m3u8"
+  },
+  {
+    "id": "il_cam_002",
+    "name": "תל אביב – חוף גורדון",
+    "lat": 32.0871,
+    "lng": 34.7694,
+    "stream": "https://ipc.technion.ac.il/gordon/playlist.m3u8"
+  },
+  {
+    "id": "il_cam_003",
+    "name": "אילת – טיילת",
+    "lat": 29.547,
+    "lng": 34.963,
+    "stream": "https://cdn1.isracam.co.il/eilat/playlist.m3u8"
+  },
+  {
+    "id": "il_cam_004",
+    "name": "חיפה – חוף דדו",
+    "lat": 32.795,
+    "lng": 34.953,
+    "stream": "https://ipc.technion.ac.il/dado/playlist.m3u8"
+  },
+  {
+    "id": "il_cam_005",
+    "name": "ירושלים – הכותל",
+    "lat": 31.7767,
+    "lng": 35.2345,
+    "stream": "https://wailing-wall.livecams.org/playlist.m3u8"
+  },
+  {
+    "id": "il_cam_006",
+    "name": "תל אביב – שד' רוטשילד",
+    "lat": 32.065,
+    "lng": 34.774,
+    "stream": "https://cdn1.isracam.co.il/rothschild/playlist.m3u8"
+  },
+  {
+    "id": "il_cam_007",
+    "name": "אילון – מחלף השלום",
+    "lat": 32.073,
+    "lng": 34.793,
+    "stream": "https://trafficcams.gov.il/eyalon/shalom/playlist.m3u8"
+  },
+  {
+    "id": "il_cam_008",
+    "name": "אילון – מחלף מסובים",
+    "lat": 32.043,
+    "lng": 34.846,
+    "stream": "https://trafficcams.gov.il/mesubim/playlist.m3u8"
+  },
+  {
+    "id": "il_cam_009",
+    "name": "כביש 2 – מחלף חבצלת",
+    "lat": 32.383,
+    "lng": 34.859,
+    "stream": "https://trafficcams.gov.il/havatselet/playlist.m3u8"
+  },
+  {
+    "id": "il_cam_010",
+    "name": "כביש 6 – מחלף קסם",
+    "lat": 32.149,
+    "lng": 34.949,
+    "stream": "https://trafficcams.gov.il/kesem/playlist.m3u8"
+  }
+]
