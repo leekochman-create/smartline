@@ -1,8 +1,10 @@
 import { NextResponse } from "next/server";
-import { supabaseServer } from "@/utils/supabaseServer";
+import { supabaseServer } from "../../../utils/supabaseServer";
 
 export async function GET() {
-  const { data, error } = await supabaseServer.from("busy").select("*");
+  const { data, error } = await supabaseServer
+    .from("busy")
+    .select("*");
 
   if (error) {
     console.error("Supabase error:", error);
