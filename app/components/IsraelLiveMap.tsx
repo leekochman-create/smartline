@@ -5,14 +5,14 @@ import { Loader } from "@googlemaps/js-api-loader";
 
 export default function IsraelLiveMap() {
   const [map, setMap] = useState<any>(null);
-  const [markers, setMarkers] = useState<any[]>([]);
-  const [selectedCamera, setSelectedCamera] = useState<any>(null);
+  const [selectedStream, setSelectedStream] = useState<string | null>(null);
+  const [selectedName, setSelectedName] = useState<string>("");
 
   useEffect(() => {
-    const initMap = async () => {
+    async function init() {
       const loader = new Loader({
         apiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!,
-        version: "weekly",
+        version: "weekly"
       });
 
       const google = await loader.load();
@@ -20,95 +20,51 @@ export default function IsraelLiveMap() {
       const mapInstance = new google.maps.Map(
         document.getElementById("israel-map") as HTMLElement,
         {
-          center: { lat: 32.0853, lng: 34.7818 }, // CENTER ISRAEL
-          zoom: 10,
-          disableDefaultUI: false,
+          center: { lat: 31.5, lng: 34.9 },
+          zoom: 8
         }
       );
 
       setMap(mapInstance);
 
-      // --- Fetch cameras from Supabase API ---
-      const res = await fetch("/api/cameras/list-israel");
-      const data = await res.json();
+      const res = await fetch("/api/cameras/live");
+      const json = await res.json();
 
-      if (!data || !data.cameras) return;
-
-      const markerList: any[] = [];
-
-      data.cameras.forEach((cam: any) => {
-        if (!cam.lat || !cam.lng) return;
-
+      json.cameras.forEach((cam: any) => {
         const marker = new google.maps.Marker({
           position: { lat: cam.lat, lng: cam.lng },
           map: mapInstance,
-          title: cam.name,
+          title: cam.name
         });
 
         marker.addListener("click", () => {
-          setSelectedCamera(cam);
+          setSelectedStream(cam.stream);
+          setSelectedName(cam.name);
         });
-
-        markerList.push(marker);
       });
+    }
 
-      setMarkers(markerList);
-    };
-
-    initMap();
+    init();
   }, []);
 
   return (
-    <div>
-      {/* MAP */}
+    <>
       <div
         id="israel-map"
-        style={{
-          width: "100%",
-          height: "650px",
-          borderRadius: "20px",
-          marginBottom: "20px",
-        }}
-      ></div>
+        style={{ width: "100%", height: "650px", borderRadius: "15px" }}
+      />
 
-      {/* POPUP WITH VIDEO */}
-      {selectedCamera && (
-        <div
-          style={{
-            padding: "20px",
-            borderRadius: "20px",
-            background: "white",
-            boxShadow: "0 4px 20px rgba(0,0,0,0.15)",
-            marginTop: "20px",
-          }}
-        >
-          <h2 style={{ marginBottom: "10px" }}>{selectedCamera.name}</h2>
-
+      {selectedStream && (
+        <div style={{ marginTop: "20px" }}>
+          <h2>📹 {selectedName}</h2>
           <video
-            src={selectedCamera.url}
-            controls
+            src={selectedStream}
             autoPlay
-            style={{
-              width: "100%",
-              borderRadius: "12px",
-              background: "#000",
-            }}
+            controls
+            style={{ width: "100%", borderRadius: "12px" }}
           />
-
-          <button
-            style={{
-              marginTop: "15px",
-              padding: "10px 18px",
-              background: "red",
-              color: "white",
-              borderRadius: "10px",
-            }}
-            onClick={() => setSelectedCamera(null)}
-          >
-            Close
-          </button>
         </div>
       )}
-    </div>
+    </>
   );
 }
