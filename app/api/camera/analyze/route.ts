@@ -19,7 +19,6 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "Missing camera id" }, { status: 400 });
   }
 
-  // Fetch camera from DB
   const { data: cam } = await supabase
     .from("global_cameras")
     .select("*")
@@ -30,44 +29,48 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "Camera not found" }, { status: 404 });
   }
 
-  // Fetch camera frame
   const frame = await fetch(cam.camera_url);
   const buffer = Buffer.from(await frame.arrayBuffer());
 
-  // ---- FIXED OPENAI VISION PROMPT ----
-  // NEW FORMAT: uses image_url only (no input_image)
+  const base64Image = buffer.toString("base64");
+
+  // NEW CORRECT OPENAI FORMAT
   const result = await openai.chat.completions.create({
     model: "gpt-4o-mini",
     messages: [
       {
         role: "user",
         content: [
-          { type: "text", text: "Count the number of people in this image." },
+          {
+            type: "text",
+            text: "Count the number of people in this image. Respond with a number only.",
+          },
           {
             type: "image_url",
-            image_url: `data:image/jpeg;base64,${buffer.toString("base64")}`,
+            image_url: {
+              url: `data:image/jpeg;base64,${base64Image}`,
+            },
           },
         ],
       },
     ],
   });
 
-  const rawText = result.choices[0].message.content || "0";
-  const people = parseInt(rawText.replace(/\D/g, "")) || 0;
+  const raw = result.choices[0].message.content || "0";
+  const number = parseInt(raw.replace(/\D/g, "")) || 0;
 
-  const busyLevel = Math.min(10, Math.max(0, Math.ceil(people / 5)));
+  const busy = Math.min(10, Math.max(1, Math.ceil(number / 5)));
 
-  // Save busy level
   await supabase.from("busy_global").upsert({
     camera_id: cam.id,
-    people_count: people,
-    busy_level: busyLevel,
+    people_count: number,
+    busy_level: busy,
     updated_at: new Date().toISOString(),
   });
 
   return NextResponse.json({
     camera: cam.name,
-    people,
-    busy_level: busyLevel,
+    people: number,
+    busy_level: busy,
   });
 }
