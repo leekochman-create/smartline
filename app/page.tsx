@@ -6,7 +6,7 @@ export default function HomePage() {
   return (
     <div style={{ padding: 20 }}>
       <h1 style={{ textAlign: "center", marginBottom: 20 }}>
-        מפת עומסי מצלמות לייב (AI)
+        מפת מצלמות לייב — ישראל
       </h1>
 
       <IsraelCamerasMap />
