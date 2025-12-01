@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { supabaseServer } from "@/lib/supabaseServer";
+import { supabaseServer } from "@/utils/supabaseServer";
 
 export async function GET() {
   const { data, error } = await supabaseServer.from("busy").select("*");
