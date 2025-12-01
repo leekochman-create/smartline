@@ -19,7 +19,7 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "Missing camera id" }, { status: 400 });
   }
 
-  // Fetch camera info
+  // Fetch camera from DB
   const { data: cam } = await supabase
     .from("global_cameras")
     .select("*")
@@ -30,11 +30,12 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "Camera not found" }, { status: 404 });
   }
 
-  // Fetch frame
-  const frameRes = await fetch(cam.camera_url);
-  const buffer = Buffer.from(await frameRes.arrayBuffer());
+  // Fetch camera frame
+  const frame = await fetch(cam.camera_url);
+  const buffer = Buffer.from(await frame.arrayBuffer());
 
-  // OpenAI Vision — correct format
+  // ---- FIXED OPENAI VISION PROMPT ----
+  // NEW FORMAT: uses image_url only (no input_image)
   const result = await openai.chat.completions.create({
     model: "gpt-4o-mini",
     messages: [
@@ -43,7 +44,7 @@ export async function GET(req: Request) {
         content: [
           { type: "text", text: "Count the number of people in this image." },
           {
-            type: "input_image",
+            type: "image_url",
             image_url: `data:image/jpeg;base64,${buffer.toString("base64")}`,
           },
         ],
@@ -51,23 +52,22 @@ export async function GET(req: Request) {
     ],
   });
 
-  // Parse result
-  const responseText = result.choices[0].message.content || "0";
-  const peopleCount = parseInt(responseText.replace(/\D/g, "")) || 0;
+  const rawText = result.choices[0].message.content || "0";
+  const people = parseInt(rawText.replace(/\D/g, "")) || 0;
 
-  const busyLevel = Math.min(10, Math.max(0, Math.ceil(peopleCount / 5)));
+  const busyLevel = Math.min(10, Math.max(0, Math.ceil(people / 5)));
 
-  // Save to Supabase
+  // Save busy level
   await supabase.from("busy_global").upsert({
     camera_id: cam.id,
-    people_count: peopleCount,
+    people_count: people,
     busy_level: busyLevel,
     updated_at: new Date().toISOString(),
   });
 
   return NextResponse.json({
     camera: cam.name,
-    people: peopleCount,
+    people,
     busy_level: busyLevel,
   });
 }
