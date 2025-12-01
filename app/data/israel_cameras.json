@@ -1,0 +1,58 @@
+[
+  {
+    "id": 1,
+    "name": "תל אביב - נמל",
+    "lat": 32.095,
+    "lng": 34.774,
+    "stream": "https://cdn1.ynet.co.il/media/LiveCam/tlv_port/index.m3u8"
+  },
+  {
+    "id": 2,
+    "name": "הרצליה - חוף אכדיה",
+    "lat": 32.165,
+    "lng": 34.808,
+    "stream": "https://cdn1.ynet.co.il/media/LiveCam/herzliya/index.m3u8"
+  },
+  {
+    "id": 3,
+    "name": "ירושלים - הכותל",
+    "lat": 31.7767,
+    "lng": 35.2345,
+    "stream": "https://kotel-live.940fm.live/VideoLibrary/kotel/kotel.m3u8"
+  },
+  {
+    "id": 4,
+    "name": "אילת - הרים",
+    "lat": 29.5577,
+    "lng": 34.9519,
+    "stream": "https://cdn1.ynet.co.il/media/LiveCam/eilat/index.m3u8"
+  },
+  {
+    "id": 5,
+    "name": "חיפה - נמל",
+    "lat": 32.825,
+    "lng": 35.007,
+    "stream": "https://haifa.livecamcdn.com/haifa_port/index.m3u8"
+  },
+  {
+    "id": 6,
+    "name": "טבריה - הכנרת",
+    "lat": 32.795,
+    "lng": 35.532,
+    "stream": "https://kineret.livecamcdn.com/kineret/index.m3u8"
+  },
+  {
+    "id": 7,
+    "name": "נתניה - חוף סירונית",
+    "lat": 32.333,
+    "lng": 34.856,
+    "stream": "https://cdn1.ynet.co.il/media/LiveCam/netanya/index.m3u8"
+  },
+  {
+    "id": 8,
+    "name": "אשדוד - חוף לידו",
+    "lat": 31.804,
+    "lng": 34.643,
+    "stream": "https://ashdod.livecamcdn.com/lido/index.m3u8"
+  }
+]
