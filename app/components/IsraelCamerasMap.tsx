@@ -26,15 +26,27 @@ export default function IsraelCamerasMap() {
 
       setMap(mapInstance);
 
-      // GET CAMERAS
       const res = await fetch("/api/cameras/list-israel");
       const json = await res.json();
 
       json.cameras.forEach((cam: any) => {
+        const level =
+          cam.people < 5 ? "green" :
+          cam.people < 20 ? "yellow" :
+          "red";
+
         const marker = new google.maps.Marker({
           position: { lat: cam.lat, lng: cam.lng },
           map: mapInstance,
-          title: cam.name
+          title: cam.name,
+          icon: {
+            path: google.maps.SymbolPath.CIRCLE,
+            scale: 12,
+            fillColor: level,
+            fillOpacity: 0.9,
+            strokeWeight: 1,
+            strokeColor: "#333",
+          }
         });
 
         marker.addListener("click", () => {
